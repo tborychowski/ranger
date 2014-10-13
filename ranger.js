@@ -2,16 +2,17 @@
 	'use strict';
 
 	var
+	_scope = null,
 	_addEvent = function (element, ev, cb, scope) {
 		scope = scope || cb;
 		element.scope = scope;
-		if (element.attachEvent) return element.attachEvent('on' + ev, cb);
-		else return element.addEventListener(ev, cb, false);
+		if (element.addEventListener) return element.addEventListener(ev, cb, false);
+		return element.attachEvent('on' + ev, cb);
 	},
 
 	_removeEvent = function (element, ev, cb) {
-		if (element.attachEvent) return element.detachEvent('on' + ev, cb);
-		else return element.removeEventListener(ev, cb, false);
+		if (element.addEventListener) return element.removeEventListener(ev, cb, false);
+		return element.detachEvent('on' + ev, cb);
 	},
 
 
@@ -30,9 +31,11 @@
 
 		this.input.isConverted = true;
 		this.input.scope = this;
-		this.value = parseFloat(this.input.value) || 0;
+
 		this.min = parseFloat(this.input.min) || 0;
 		this.max = parseFloat(this.input.max) || 100;
+		this.value = parseFloat(this.input.value) || 0;
+		this.value = Math.max(this.min, Math.min(this.max, this.value));
 
 		this.config.onSlide = function () {};
 		this.config.onSlideStart = function () {};
@@ -64,7 +67,7 @@
 		this.maxX = this.el.offsetWidth - this.knob.offsetWidth;
 		this.knob.style.left = this.valToPx(this.value) + 'px';
 
-		_addEvent(this.knob, 'click', function (e) { e.preventDefault(); });
+		_addEvent(this.knob, 'click', function (e) { if (e.preventDefault) e.preventDefault(); });
 		_addEvent(this.el, 'mousedown', this.barMouseDown, this);
 		_addEvent(this.knob, 'mousedown', this.onMouseDown, this);
 		_addEvent(this.knob, 'keydown', this.onKeyDown, this);
@@ -109,17 +112,17 @@
 
 	Ranger.prototype.onKeyDown = function (e) {
 		var self = this.scope;
-		if (e.keyCode === 39) self.move.call(self, 1);
-		else if (e.keyCode === 37) self.move.call(self, -1);
-		else if (e.keyCode === 36) self.move.call(self, 0);
-		else if (e.keyCode === 35) self.move.call(self, 100);
-		else console.log(e.keyCode);
+		// if (!self) self = e.srcElement.scope;
+		if (e.keyCode === 37) self.move.call(self, -1);			// left
+		else if (e.keyCode === 39) self.move.call(self, 1);		// right
+		else if (e.keyCode === 36) self.move.call(self, 0);		// home
+		else if (e.keyCode === 35) self.move.call(self, 100);	// end
 	};
 
 	Ranger.prototype.onMouseDown = function (e) {
-		var self = this.scope;
+		if (!this.scope) return;
+		var self = _scope = this.scope;
 		if (self.dragging) return;
-		e.preventDefault();
 		self.dragging = true;
 		self.x0 = e.clientX - self.knob.offsetLeft || 0;
 		self.maxX = self.el.offsetWidth - self.knob.offsetWidth;
@@ -127,30 +130,37 @@
 		_addEvent(document, 'mouseup', self.onMouseUp, self);
 		self.config.onSlideStart.call(self, self.value);
 		self.knob.focus();
+		if (e.preventDefault) e.preventDefault();
+		else e.returnValue = false;
 	};
 
 	Ranger.prototype.onMouseUp = function (e) {
-		var self = this.scope;
+		var self = _scope;
 		_removeEvent(document, 'mousemove', self.onMouseMove);
 		_removeEvent(document, 'mouseup', self.onMouseUp);
 		self.input.value = self.value;
 		self.dragging = false;
 		self.config.onSlideEnd.call(self, self.value);
+		e.returnValue = false;
+		_scope = null;
 	};
 
 	Ranger.prototype.onMouseMove = function (e) {
-		var self = this.scope, x = Math.max(0, Math.min(self.maxX, e.clientX - self.x0));
+		var self = _scope, x;
+		x = Math.max(0, Math.min(self.maxX, e.clientX - self.x0));
 		if (!self.dragging) return;
 		self.knob.style.left = x + 'px';
 		self.value = self.pxToVal.call(self, x);
 		self.config.onSlide.call(self, self.value, x);
+		e.returnValue = false;
 	};
 
 
 	Ranger.prototype.barMouseDown = function (e) {
-		var self = this.scope,
-			knobW = self.knob.offsetWidth,
-			x = e.clientX - (self.el.offsetLeft || 0) - knobW / 2 + 2;
+		var self = this.scope, knobW, x;
+		if (!self) self = e.srcElement.scope;
+		knobW = self.knob.offsetWidth;
+		x = e.clientX - (self.el.offsetLeft || 0) - knobW / 2 + 2;
 		self.maxX = self.el.offsetWidth - knobW;
 		x = Math.max(0, Math.min(self.maxX, x));
 		self.knob.style.left = x + 'px';
@@ -161,10 +171,12 @@
 
 	Ranger.prototype.onMouseWheel = function (e) {
 		var self = this.scope, delta;
+		if (!self) self = e.srcElement.scope;
 		e = window.event || e;
 		delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 		self.move.call(self, delta);
-		e.preventDefault();
+		if (e.preventDefault) e.preventDefault();
+		return false;
 	};
 
 

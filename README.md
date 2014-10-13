@@ -8,7 +8,7 @@ Pure JS range-slider (horizontal).
 - focusable & keyboard support (left+right, home+end)
 - mousewheel support
 - callbacks (slideStart, slide, slideEnd)
-- works in modern browsers (>=IE11)
+- works everywhere (even IE5)
 
 
 ### Sample usage:

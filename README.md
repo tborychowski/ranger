@@ -17,7 +17,6 @@ var slider1 = new Ranger(document.getElementById('range1'));
 slider1.slide(function (val) {
 	console.log('value: ' + val)
 });
-
 ```
 
 ###License

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+<title>ranger</title>
+<link rel="stylesheet" href="ranger.css">
+</head>
+<body>
+
+<input id="range1" type="text" value="0"><span id="lbl1">0</span>
+<br>
+<input id="range2" type="range" value="0" min="10" max="90"><span id="lbl2">0</span>
+
+<br><br>
+<button onclick="init()">init</button>
+<button onclick="destroy()">destroy</button>
+
+<script src="ranger.js"></script>
+<script>
+(function () {
+	'use strict';
+
+	var i1, i2,
+		l1 = document.getElementById('lbl1'),
+		l2 = document.getElementById('lbl2');
+
+	window.init = function () {
+		i1 = new Ranger(document.getElementById('range1'))
+			.slide(function (v) {
+				lbl1.innerHTML = v;
+			});
+
+		i2 = new Ranger(document.getElementById('range2'))
+			.slide(function (v) {
+				lbl2.innerHTML = v;
+			});
+	};
+
+	window.destroy = function () {
+		// console.log(i1);
+		i1.destroy();
+		i2.destroy();
+	};
+
+	init();
+
+}());
+</script>
+</body>

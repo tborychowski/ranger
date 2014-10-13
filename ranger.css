@@ -1,0 +1,3 @@
+.ranger { width: 200px; height: 24px; background: #eee; margin: 1px; position: relative; cursor: default; display: inline-block; }
+.ranger-knob { width: 30px; height: 24px; display: block; background: #999; position: relative; cursor: default; }
+.ranger-knob:focus { outline: 1px dotted gray; }

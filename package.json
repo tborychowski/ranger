@@ -1,0 +1,12 @@
+{
+  "name": "ranger-slider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ranger.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tborychowski/ranger.git"
+  },
+  "author": "Tom",
+  "license": "MIT"
+}

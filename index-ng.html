@@ -1,0 +1,36 @@
+<!doctype html>
+<html xmlns:ng="http://angularjs.org" ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>ranger</title>
+<link rel="stylesheet" href="ranger.css">
+</head>
+<body ng-controller="main">
+
+<!-- <input id="range1" type="text" value="0"><span id="lbl1">0</span>
+<br>
+<input id="range2" type="range" value="0" min="10" max="90"><span id="lbl2">0</span>
+ -->
+<ranger value="v1" min="0" max="100"></ranger><input ng-model="v1"/>
+<ranger value="v2" min="10" max="90"></ranger><input ng-model="v2"/>
+<br><br>
+
+<script src="angular.min.js"></script>
+<script>
+angular.module('app', [])
+.controller('main',  function ($scope) {
+	'use strict';
+
+	$scope.v1 = 20;
+	$scope.v2 = 20;
+
+	// setTimeout(function () {
+	// 	$scope.v1 = 100;
+	// 	$scope.$apply();
+	// }, 100);
+
+});
+</script>
+<script src="ranger-ng.js"></script>
+</body>
+</html>

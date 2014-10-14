@@ -62,7 +62,8 @@ angular.module('app').directive('ranger', function () {
 			function onMouseDown (e) {
 				if (dragging) return;
 				dragging = true;
-				scope.x0 = e.clientX - knob[0].offsetLeft || 0;
+				x0 = e.clientX - getOffsetLeft(knob[0]);
+				elx0 = getOffsetLeft(el[0]);
 				maxX = el[0].offsetWidth - knob[0].offsetWidth;
 
 				angular.element(document).on('mousemove', onMouseMove);
@@ -82,13 +83,14 @@ angular.module('app').directive('ranger', function () {
 
 			function onMouseMove (e) {
 				if (!dragging) return;
-				setValue(e.clientX - scope.x0);
+				setValue(e.clientX - x0 - elx0);
 				e.returnValue = false;
 			}
 
 			function barMouseDown (e) {
+				if (angular.element(e.target).hasClass('ranger-knob')) return;
 				var knobW = knob[0].offsetWidth,
-					x = e.clientX - (el[0].offsetLeft || 0) - knobW / 2 + 2;
+					x = e.clientX - getOffsetLeft(el[0]) - knobW / 2 + 2;
 				maxX = el[0].offsetWidth - knobW;
 				setValue(x);
 				onMouseDown.call(knob, e);
@@ -113,12 +115,22 @@ angular.module('app').directive('ranger', function () {
 			function valToPx (val) { return Math.round(maxX * (val - scope.min) / (scope.max - scope.min)); }
 
 
+			function getOffsetLeft (el) {
+				var x = 0;
+				while (el) {
+					if (el.offsetLeft) x += el.offsetLeft - el.scrollLeft;
+					el = el.parentNode;
+				}
+				return x;
+			}
+
 			var
 				el = elem,
 				knob = elem.find('a'),
 				input = elem.find('input'),
 				dragging = false,
-				maxX = el[0].offsetWidth - knob[0].offsetWidth;
+				maxX = el[0].offsetWidth - knob[0].offsetWidth,
+				x0 = 0, elx0 = 0;
 
 			knob.on('click', function (e) { if (e.preventDefault) e.preventDefault(); });
 			el.on('mousedown', barMouseDown);

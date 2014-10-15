@@ -2,6 +2,7 @@ Ranger
 ======
 
 Pure JS range-slider (horizontal).
+[DEMO](http://htmlpreview.github.io/?https://raw.githubusercontent.com/tborychowski/ranger/master/index.html)
 
 ### Features:
 - no dependencies

@@ -19,6 +19,3 @@ slider1.slide(function (val) {
 	console.log('value: ' + val)
 });
 ```
-
-###License
-*MIT*
